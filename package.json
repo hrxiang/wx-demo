@@ -1,0 +1,36 @@
+{
+	"name": "wx-demo",
+	"version": "1.0.0",
+	"description": "uni-app 微信小程序项目",
+	"uni-app": {
+		"scripts": {
+			"mp-weixin-dev": {
+				"title": "微信小程序：开发环境",
+				"env": {
+					"UNI_PLATFORM": "mp-weixin"
+				},
+				"define": {
+					"ENV-DEV": true
+				}
+			},
+			"mp-weixin-test": {
+				"title": "微信小程序：测试环境",
+				"env": {
+					"UNI_PLATFORM": "mp-weixin"
+				},
+				"define": {
+					"ENV-TEST": true
+				}
+			},
+			"mp-weixin-prod": {
+				"title": "微信小程序：生产环境",
+				"env": {
+					"UNI_PLATFORM": "mp-weixin"
+				},
+				"define": {
+					"ENV-PROD": true
+				}
+			}
+		}
+	}
+}

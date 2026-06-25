@@ -1,0 +1,56 @@
+{
+	"pages": [{
+			"path": "pages/index/home/home",
+			"style": {
+				"navigationBarTitleText": "首页"
+				// "navigationStyle": "custom",
+				// "enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/index/mine/mine",
+			"style": {
+				"navigationBarTitleText": "我的"
+			}
+		},
+		{
+			"path": "pages/font-align-grid-demo/font-align-grid-demo",
+			"style": {
+				"navigationBarTitleText": "字号对齐网格"
+			}
+		},
+		{
+			"path": "pages/custom-nav-bar-demo/custom-nav-bar-demo",
+			"style": {
+				"navigationBarTitleText": "我是标题",
+				"navigationStyle": "custom"
+			}
+		}
+	],
+	"tabBar": {
+		"color": "#7A7E83", //tab 上的文字默认颜色
+		"selectedColor": "#3cc51f", //tab 上的文字选中时的颜色
+		"borderStyle": "black", //tabbar 上边框的颜色，可选值 black/white，black对应颜色rgba(0,0,0,0.33)，white对应颜色rgba(255,255,255,0.33)。
+		"backgroundColor": "transparent", // tab 的背景色
+		"list": [{
+			"pagePath": "pages/index/home/home",
+			"iconPath": "/static/c1.png",
+			"selectedIconPath": "/static/c2.png",
+			"text": "首页"
+		}, {
+			"pagePath": "pages/index/mine/mine",
+			"iconPath": "/static/c3.png",
+			"selectedIconPath": "/static/c4.png",
+			"text": "我的"
+		}]
+	},
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8",
+		"app-plus": {
+			"background": "#efeff4"
+		}
+	}
+}
