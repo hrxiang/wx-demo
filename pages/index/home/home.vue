@@ -1,7 +1,7 @@
 <template>
 	<view style="background-color: yellow;">
 		<my-table :columns="columns" :dataSource="dataSource" :stickyHeader="true"></my-table>
-		<button @click="toTestPage">click</button>
+		<button @click="testApi">click</button>
 		<text class="iconfont icon-qianbao"></text>
 		<!-- ==================== Pinia Store 使用示例 ==================== -->
 		<view style="padding: 20rpx; background: #f5f5f5; margin-top: 20rpx;">
@@ -35,6 +35,7 @@
 	import { storage } from '@/utils/storage'
 	import { STORAGE_KEYS } from '@/config';
 	import { nav } from '@/utils/nav';
+	import { request } from '@/utils/request'
 
 	// 跳过打开新页面时的token验证
 	storage.setString(STORAGE_KEYS.token, 'xxxxx');
@@ -108,6 +109,9 @@
 	function toTestPage() {
 		// nav.to('/pages/font-align-grid-demo/font-align-grid-demo');
 		nav.to('/pages/custom-nav-bar-demo/custom-nav-bar-demo')
+	}
+	function testApi() {
+		request.get('https://api.github.com/users/hrxiang', null, { custom: { loading: true } });
 	}
 </script>
 

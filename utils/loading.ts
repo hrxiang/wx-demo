@@ -73,8 +73,10 @@ class GlobalLoading {
 		// 延迟 100ms 关闭，避免快速 show→hide→show 导致闪烁
 		this.hideDebounceTimer = setTimeout(() => {
 			if (this.loadingCount <= 0 && this.isShowing) {
-				uni.hideLoading({ noConflict: true });
-				this.isShowing = false;
+				// uni.hideLoading({ noConflict: true });
+				// this.isShowing = false;
+				this.hideDebounceTimer = null;
+				this.forceClose();
 			}
 		}, 100) as unknown as number;
 	}

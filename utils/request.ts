@@ -217,14 +217,16 @@ http.interceptors.response.use(
 		// 其他业务错误
 		const message = body.message || '请求失败';
 		if (!custom.silent) {
-			uni.showToast({ title: message, icon: 'none' });
+			//延时100ms，解决警告： 请注意 showLoading 与 hideLoading 必须配对使用。
+			setTimeout(() => {
+				uni.showToast({ title: message, icon: 'none' });
+			}, custom._hideLoading ? 100 : 0);
 		}
 		return Promise.reject(new Error(message));
 	},
 	(error: HttpError) => {
 		// HTTP 层面的错误（网络断开、超时、服务器 5xx 等）
 		const custom = (error.config?.custom || {}) as RequestCustom;
-
 		// 请求失败，关闭 loading
 		custom._hideLoading?.();
 
@@ -238,7 +240,10 @@ http.interceptors.response.use(
 		}
 
 		if (!custom.silent) {
-			uni.showToast({ title: message, icon: 'none' });
+			//延时100ms，解决警告： 请注意 showLoading 与 hideLoading 必须配对使用。
+			setTimeout(() => {
+				uni.showToast({ title: message, icon: 'none' });
+			}, custom._hideLoading ? 100 : 0);
 		}
 
 		return Promise.reject(error);
