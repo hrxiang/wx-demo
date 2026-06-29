@@ -25,6 +25,12 @@
 				"navigationBarTitleText": "我是标题",
 				"navigationStyle": "custom"
 			}
+		},
+		{
+			"path": "pages/message-read-demo/message-read-demo",
+			"style": {
+				"navigationBarTitleText": "消息已读检测"
+			}
 		}
 	],
 	"tabBar": {

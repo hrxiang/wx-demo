@@ -1,7 +1,7 @@
 <template>
 	<view style="background-color: yellow;">
 		<my-table :columns="columns" :dataSource="dataSource" :stickyHeader="true"></my-table>
-		<button @click="testApi">click</button>
+		<button @click="toTestPage">click</button>
 		<text class="iconfont icon-qianbao"></text>
 		<!-- ==================== Pinia Store 使用示例 ==================== -->
 		<view style="padding: 20rpx; background: #f5f5f5; margin-top: 20rpx;">
@@ -108,7 +108,7 @@
 
 	function toTestPage() {
 		// nav.to('/pages/font-align-grid-demo/font-align-grid-demo');
-		nav.to('/pages/custom-nav-bar-demo/custom-nav-bar-demo')
+		nav.to('/pages/message-read-demo/message-read-demo')
 	}
 	function testApi() {
 		request.get('https://api.github.com/users/hrxiang', null, { custom: { loading: true } });
