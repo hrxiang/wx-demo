@@ -108,7 +108,7 @@
 
 	function toTestPage() {
 		// nav.to('/pages/font-align-grid-demo/font-align-grid-demo');
-		nav.to('/pages/message-read-demo/message-read-demo')
+		nav.to('/pages/marquee-ticker-demo/marquee-ticker-demo')
 	}
 	function testApi() {
 		request.get('https://api.github.com/users/hrxiang', null, { custom: { loading: true } });

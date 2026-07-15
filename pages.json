@@ -31,6 +31,12 @@
 			"style": {
 				"navigationBarTitleText": "消息已读检测"
 			}
+		},
+		{
+			"path": "pages/marquee-ticker-demo/marquee-ticker-demo",
+			"style": {
+				"navigationBarTitleText": "走马灯组件"
+			}
 		}
 	],
 	"tabBar": {
