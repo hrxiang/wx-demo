@@ -255,13 +255,13 @@ export default {
 
 	// Vue 2 销毁前
 	beforeDestroy() {
-		console.log('[marquee-ticker] beforeDestroy.')
+		console.log('[marquee-ticker] Vue2 beforeDestroy.')
 		this.cleanup();
 	},
 
 	// Vue 3 卸载前
 	beforeUnmount() {
-		console.log('[marquee-ticker] beforeUnmount.')
+		console.log('[marquee-ticker] Vue3 beforeUnmount.')
 		this.cleanup();
 	},
 
@@ -305,6 +305,7 @@ export default {
 			this.isAnimating = true;
 			this.$emit('switch', { from: this.currentIndex, to: this.nextIndex });
 
+			// 下面代码使用onTransitionEnd方法代替，解决替换闪烁问题
 			// if (this._animTimer) clearTimeout(this._animTimer);
 			// this._animTimer = setTimeout(() => {
 			// 	this._finishAnim();
