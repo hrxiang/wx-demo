@@ -44,7 +44,7 @@
 			- 水平方向：宽度 200%，内容水平排列
 			通过 translate 整体移动，overflow: hidden 在 wrapper 上裁剪
 		-->
-		<view class="marquee-track" :style="trackStyle">
+		<view class="marquee-track" :style="trackStyle" @transitionend="onTransitionEnd">
 			<!--
 				循环渲染两个内容块
 				注意：key 使用 idx 保证两个块始终存在，内容由 displayItems 动态决定
@@ -234,18 +234,6 @@ export default {
 			// 组装最终样式：基础尺寸/布局 + 当前 transform + 是否需要动画过渡
 			return `${this.trackBaseStyle} transform: ${transform}; ${transition}`;
 		},
-
-		/** 实际使用的动画时长，保证不超过 interval - 200 */
-		safeDuration() {
-			const minGap = 200; // 动画结束到下一次触发的安全间隔
-			if (this.interval <= this.duration + minGap) {
-				console.warn(
-					`[marquee-ticker] interval (${this.interval}ms) 应大于 duration (${this.duration}ms) + ${minGap}ms。已将动画时长自动调整为 ${this.interval - minGap}ms。`
-				);
-				return Math.max(0, this.interval - minGap);
-			}
-			return this.duration;
-		}
 	},
 
 	watch: {
@@ -317,10 +305,10 @@ export default {
 			this.isAnimating = true;
 			this.$emit('switch', { from: this.currentIndex, to: this.nextIndex });
 
-			if (this._animTimer) clearTimeout(this._animTimer);
-			this._animTimer = setTimeout(() => {
-				this._finishAnim();
-			}, this.duration);
+			// if (this._animTimer) clearTimeout(this._animTimer);
+			// this._animTimer = setTimeout(() => {
+			// 	this._finishAnim();
+			// }, this.duration);
 		},
 
 		/**
@@ -338,13 +326,15 @@ export default {
 		 *    只是从轨道下半部瞬间切到上半部，用户感知完全无缝
 		 */
 		_finishAnim() {
-			this.$nextTick(() => {
-				const oldNext = this.nextIndex;
-				this.currentIndex = oldNext;
-				this.nextIndex = (oldNext + 1) % this.list.length;
-				this.isAnimating = false;
-				this.$emit('switched', { current: this.currentIndex });
-			});
+			const oldNext = this.nextIndex;
+			this.currentIndex = oldNext;
+			this.nextIndex = (oldNext + 1) % this.list.length;
+			this.isAnimating = false;
+			this.$emit('switched', { current: this.currentIndex });
+		},
+
+		onTransitionEnd(e) {
+			this._finishAnim();
 		}
 	}
 };

@@ -41,7 +41,7 @@
 		<view class="section">
 			<text class="section-title">5. 自定义样式（使用 item slot）</text>
 			<view class="demo-box demo-box-custom">
-				<marquee-ticker :list="customList" :interval="3000" :height="100" :duration="600">
+				<marquee-ticker-v2 :list="customList" :interval="3000" :height="100" :duration="600">
 					<template v-slot:item="{ item }">
 						<view class="custom-item">
 							<view class="custom-icon" :style="{ backgroundColor: item.iconColor }">
@@ -53,7 +53,7 @@
 							</view>
 						</view>
 					</template>
-				</marquee-ticker>
+				</marquee-ticker-v2>
 			</view>
 		</view>
 
