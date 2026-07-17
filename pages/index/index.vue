@@ -1,6 +1,8 @@
 <template>
 	<view style="background-color: yellow;">
-		<button @click="toTestPage">click</button>
+		<button v-for="page in pages" @click="toTestPage(page.url)" style="margin-top: 10rpx;">
+			{{ page.title }}
+		</button>
 		<button @click="testApi" style="margin-top: 10rpx;">
 			测试api
 		</button>
@@ -106,8 +108,16 @@
 		{ id: 1, name: '李四', age: 22, sex: '男' },
 		{ id: 2, name: '王五', age: 20, sex: '男' },
 	];
-
-	function toTestPage() {
+	const pages = [
+		{ title: '自定义标题栏', url: '/pages/custom-nav-bar-demo/custom-nav-bar-demo' },
+		{ title: '跑马灯', url: '/pages/marquee-ticker-demo/marquee-ticker-demo' },
+		{ title: '网格文字对齐', url: '/pages/font-align-grid-demo/font-align-grid-demo' },
+		{ title: '消息已读', url: '/pages/message-read-demo/message-read-demo' },
+		{ title: '网格布局', url: '/pages/grid-view-demo/grid-view-demo' },
+		{ title: '表格', url: '/pages/table-demo/table-demo' },
+		{ title: '共享状态', url: '/pages/state-sharing-demo/state-sharing-demo' },
+	];
+	function toTestPage(url) {
 		//custom-nav-bar-demo
 		//marquee-ticker-demo
 		//font-align-grid-demo
@@ -115,7 +125,7 @@
 		//grid-view-demo
 		//table-demo
 		//state-sharing-demo
-		nav.to('/pages/marquee-ticker-demo/marquee-ticker-demo')
+		nav.to(url)
 	}
 	function testApi() {
 		request.get('https://api.github.com/users/hrxiang', null, { custom: { loading: true } });
