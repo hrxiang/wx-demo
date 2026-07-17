@@ -113,49 +113,149 @@
 				}
 			};
 		},
+		/**
+		 * created — 组件创建时计算导航栏尺寸与字体大小
+		 *
+		 * 目标：让自定义导航栏的高度和标题字号在所有环境下
+		 * 与当前平台系统原生导航栏保持一致。
+		 *
+		 * 适配环境：
+		 * - 微信开发者工具模拟器（iOS / Android，刘海屏 / 非刘海屏）
+		 * - iOS 真机（刘海屏 / 非刘海屏）
+		 * - Android 真机（各品牌）
+		 * - Mac / Windows 桌面端
+		 *
+		 * ─────────────────────────────────────────────────────────────────
+		 * 关键概念：platform vs osName
+		 * ─────────────────────────────────────────────────────────────────
+		 *
+		 * uni.getDeviceInfo() 返回两个字段，含义不同：
+		 *
+		 * platform（运行环境）：
+		 *   'devtools' — 微信开发者工具（无论模拟哪种设备）
+		 *   'ios'      — iOS 真机
+		 *   'android'  — Android 真机
+		 *   'windows'  — Windows 桌面端
+		 *   'mac'      — Mac 桌面端
+		 *
+		 * osName（模拟的设备系统）：
+		 *   'ios'      — 当前模拟的是 iOS 设备（如 iPhone 14 Pro）
+		 *   'android'  — 当前模拟的是 Android 设备（如 Pixel 7）
+		 *   'windows'  — Windows 桌面
+		 *   'macos'    — macOS 桌面
+		 *
+		 * 关键区别：在开发者工具中 platform 恒为 'devtools'，
+		 * 但 osName 会随模拟器选择的设备型号而变化。
+		 *
+		 * 因此：高度修正用 platform + osName 联合判断，字号用 platform 判断。
+		 *
+		 * ─────────────────────────────────────────────────────────────────
+		 * 导航栏高度计算原理
+		 * ─────────────────────────────────────────────────────────────────
+		 *
+		 * 微信小程序的胶囊按钮（≡ ☰）由系统渲染，其位置与系统导航栏严格对齐。
+		 * 通过胶囊按钮的尺寸和位置，可以反推出系统导航栏的高度。
+		 *
+		 * 计算公式：
+		 *   navbarHeight = capsuleHeight + (capsuleTop - statusBarHeight) × 2
+		 *
+		 * 原理图（上下对称留白法）：
+		 *
+		 *   ┌──────────────────────────────────────────┐
+		 *   │             状态栏 (statusBar)            │ ← statusBarHeight
+		 *   ├──────────────────────────────────────────┤
+		 *   │                                          │
+		 *   │  ↑ 留白 = capsuleTop - statusBar         │
+		 *   │  ┌───────────┐                           │
+		 *   │  │ 胶囊按钮   │  ← capsuleHeight         │
+		 *   │  └───────────┘                           │
+		 *   │  ↓ 留白 = capsuleTop - statusBar         │
+		 *   ├──────────────────────────────────────────┤
+		 *   │              页面内容区域                  │
+		 *   └──────────────────────────────────────────┘
+		 *
+		 *   navbarHeight（内容区）= 留白 + capsuleHeight + 留白
+		 *                       = (capsuleTop - statusBar) × 2 + capsuleHeight
+		 *
+		 * ─────────────────────────────────────────────────────────────────
+		 * 模拟器高度修正
+		 * ─────────────────────────────────────────────────────────────────
+		 *
+		 * 问题：在微信开发者工具模拟 iOS 刘海屏（如 iPhone 14 Pro）时，
+		 * getMenuButtonBoundingClientRect() 返回的胶囊高度偏小，
+		 * 导致计算出的 navbarHeight 小于系统原生导航栏高度。
+		 *
+		 * 解决方案：在 devtools 环境下取计算值与平台标准值的较大者：
+		 * - iOS 标准导航栏内容区高度 = 44px
+		 * - Android Material Design 标准高度 = 48px
+		 *
+		 * 对比：
+		 * ┌──────────────────────────────────────────────────┐
+		 * │ devtools + iOS:  navbarHeight = max(计算值, 44)  │
+		 * │ devtools + 安卓:  navbarHeight = max(计算值, 48) │
+		 * │ 其他环境:        navbarHeight = 计算值（真机精确）│
+		 * └──────────────────────────────────────────────────┘
+		 *
+		 * ─────────────────────────────────────────────────────────────────
+		 * 字体大小适配
+		 * ─────────────────────────────────────────────────────────────────
+		 *
+		 * 各平台系统原生导航栏的标题字号不同，使用 platform 判断：
+		 * - iOS 真机:     17px（iOS Human Interface Guidelines 标准标题字号）
+		 * - Android 真机: 16px（Material Design 标准标题字号）
+		 * - 其他（PC/模拟器）: 14px（桌面端缩放适配）
+		 */
 		created() {
+			// ---- 1. 获取系统信息 ----
 			const windowInfo = uni.getWindowInfo();
 			const deviceInfo = uni.getDeviceInfo();
 			const platform = deviceInfo.platform;
 			const osName = deviceInfo.osName;
-			const isIos = platform === 'ios';
-			const isAndroid = platform === 'android';
-			const isWindows = platform === 'windows';
-			const isMac = platform === 'mac';
-			const isOhos = platform === 'ohos';
-			const isOhosPc = platform === 'ohos_pc';
-			const isDevtools = platform === 'devtools';
+			const statusBarHeight = windowInfo.statusBarHeight;
 
-			if (platform === 'devtools') {
-				// 模拟器环境：uni.getMenuButtonBoundingClientRect 返回的值不可靠，使用固定值模拟
-				const simulatedStatusBarHeight = 20;
-				const simulatedCapsuleWidth = 87;
-				const simulatedCapsuleHeight = 32;
-				const simulatedCapsuleRight = 10;
-				// 模拟器中 osName 取决于宿主机系统，此处仅做粗略适配
-				const simulatedCapsuleTop = simulatedStatusBarHeight + (osName === 'ios' ? 6 : 8);
-				const capsuleLeft2ScreenRightDistance = simulatedCapsuleWidth + simulatedCapsuleRight;
+			// ---- 2. 获取胶囊按钮位置，计算导航栏核心尺寸 ----
 
-				// 导航栏高度 = 胶囊高度 + (胶囊顶部 - 状态栏高度) × 2（上下对称留白）
-				this.navbarHeight = simulatedCapsuleHeight + (simulatedCapsuleTop - simulatedStatusBarHeight) * 2;
-				this.statusbarHeight = simulatedStatusBarHeight;
-				this.rightMargin = capsuleLeft2ScreenRightDistance;
-				this.defaultStyle.fontSize = '13px';
-				// this.defaultStyle.backgroundColor = osName === 'ios' ? '#F8F8F8' : '#FFFFFF';
+			// 微信胶囊按钮的矩形信息（px）
+			// { width, height, top, right, left, bottom }
+			const custom = uni.getMenuButtonBoundingClientRect();
+
+			// right slot 的右偏移量：胶囊左边缘到屏幕右边的距离
+			// 这样 right slot 的内容不会被胶囊按钮遮挡
+			//   屏幕右边缘                    胶囊左边缘
+			//     │←────────── capsuleRight ──────────→│
+			//     │                                │ ┌────┐
+			//     │                                │ │ ≡☰ │
+			//     │                                │ └────┘
+			const capsuleRight = windowInfo.screenWidth - custom.left;
+
+			// 导航栏内容区高度（上下对称留白法）
+			const calcNavbarHeight = custom.height + (custom.top - statusBarHeight) * 2;
+
+			// ---- 3. 赋值给组件状态 ----
+			this.statusbarHeight = statusBarHeight;
+			this.rightMargin = capsuleRight;
+
+			// ---- 4. 模拟器高度修正 ----
+			// devtools 模拟刘海屏时胶囊数据可能偏小，取平台标准值兜底
+			if (platform === 'devtools' && osName === 'ios') {
+				// iOS 系统导航栏内容区标准高度 = 44px
+				this.navbarHeight = Math.max(calcNavbarHeight, 44);
+			} else if (platform === 'devtools' && osName === 'android') {
+				// Android Material Design 标准高度 = 48px
+				this.navbarHeight = Math.max(calcNavbarHeight, 48);
 			} else {
-				// 真机环境：通过系统 API 获取精确值
-				const statusBarHeight = windowInfo.statusBarHeight;
-				// 获取微信胶囊按钮位置（width, height, top, right, left, bottom）
-				const custom = uni.getMenuButtonBoundingClientRect();
-				// 胶囊左边缘到屏幕右边的距离 = right slot 的右偏移量
-				const capsuleLeft2ScreenRightDistance = windowInfo.screenWidth - custom.left;
+				// 真机 / PC：直接使用胶囊按钮计算值（精确）
+				this.navbarHeight = calcNavbarHeight;
+			}
 
-				// 导航栏高度 = 胶囊高度 + (胶囊顶部 - 状态栏高度) × 2（上下对称留白）
-				this.navbarHeight = custom.height + (custom.top - statusBarHeight) * 2;
-				this.statusbarHeight = statusBarHeight;
-				this.rightMargin = capsuleLeft2ScreenRightDistance;
-				this.defaultStyle.fontSize = isWindows || isMac ? '14px' : '17px';
-				// this.defaultStyle.backgroundColor = osName === 'ios' ? '#F8F8F8' : '#FFFFFF';
+			// ---- 5. 字体大小适配 ----
+			if (platform === 'ios') {
+				this.defaultStyle.fontSize = '17px';
+			} else if (platform === 'android') {
+				this.defaultStyle.fontSize = '16px';
+			} else {
+				// devtools / windows / mac
+				this.defaultStyle.fontSize = '14px';
 			}
 		}
 	}
