@@ -46,11 +46,43 @@ function getToken() : string {
 }
 
 /**
- * 判断路径是否在白名单中
- * @param path 不含查询参数的路径，如 '/pages/login/index'
+ * 解析 URL 查询参数
+ *
+ * 将 URL 的 query string 解析为键值对对象。
+ * 例：'/pages/detail/index?id=1&whitelist=true' → { id: '1', whitelist: 'true' }
+ *
+ * @param url 完整 URL（含查询参数）
+ * @returns 参数键值对对象
  */
-function isWhitelisted(path : string) : boolean {
-	return WHITE_LIST.has(path);
+function parseQuery(url : string) : Record<string, string> {
+	const queryIndex = url.indexOf('?');
+	if (queryIndex === -1) return {};
+	const queryString = url.slice(queryIndex + 1);
+	const params : Record<string, string> = {};
+	queryString.split('&').forEach(pair => {
+		const [key, value] = pair.split('=');
+		if (key) params[key] = decodeURIComponent(value || '');
+	});
+	return params;
+}
+
+/**
+ * 判断路径是否在白名单中
+ *
+ * 白名单判定逻辑（满足任一即放行）：
+ * 1. 静态白名单：路径命中 WHITE_LIST 集合
+ * 2. 动态白名单：URL 参数中包含 whitelist=true
+ *    用法示例：uni.navigateTo({ url: '/pages/detail/index?whitelist=true' })
+ *
+ * @param path 不含查询参数的路径，如 '/pages/login/index'
+ * @param url  完整 URL（含查询参数），用于解析动态白名单参数
+ */
+function isWhitelisted(path : string, url : string) : boolean {
+	// 静态白名单
+	if (WHITE_LIST.has(path)) return true;
+	// 动态白名单：URL 参数 whitelist=true
+	const query = parseQuery(url);
+	return query.whitelist === 'true';
 }
 
 /**
@@ -95,7 +127,7 @@ export function initPermission() : void {
 				// 触发页面进入前的副作用
 				onBeforeEnter(path);
 
-				if (isWhitelisted(path)) {
+				if (isWhitelisted(path, to.url)) {
 					return true;
 				}
 
