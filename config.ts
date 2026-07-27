@@ -28,7 +28,7 @@ export const ROUTES = {
 	home: '/pages/index/index',
 
 	/** 公共 WebView 页（白名单成员） */
-	webview: '/pages/common/webview/index',
+	webview: '/pages/webview/index',
 } as const;
 
 // ==================== 本地存储键名 ====================

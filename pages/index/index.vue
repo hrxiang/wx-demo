@@ -116,6 +116,8 @@
 		{ title: '网格布局', url: '/pages/grid-view-demo/grid-view-demo' },
 		{ title: '表格', url: '/pages/table-demo/table-demo' },
 		{ title: '共享状态', url: '/pages/state-sharing-demo/state-sharing-demo' },
+		{ title: '导出Excel', url: '/pages/excel-export-demo/excel-export-demo' },
+		{ title: '导出Pdf', url: '/pages/pdf-export-demo/pdf-export-demo' },
 	];
 	function toTestPage(url) {
 		//custom-nav-bar-demo

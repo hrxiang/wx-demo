@@ -49,6 +49,18 @@
 			"style": {
 				"navigationBarTitleText": "状态共享"
 			}
+		},
+		{
+			"path": "pages/excel-export-demo/excel-export-demo",
+			"style": {
+				"navigationBarTitleText": "Excel 导出"
+			}
+		},
+		{
+			"path": "pages/pdf-export-demo/pdf-export-demo",
+			"style": {
+				"navigationBarTitleText": "图片导出"
+			}
 		}
 	],
 	// "tabBar": {
