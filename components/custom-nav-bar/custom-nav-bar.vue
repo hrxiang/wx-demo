@@ -54,6 +54,8 @@
 </template>
 
 <script>
+	import { nav } from '@/utils/nav';
+
 	export default {
 		name: "custom-nav-bar",
 		props: {
@@ -64,12 +66,12 @@
 			},
 			/**
 			 * 返回箭头的点击回调
-			 * 默认行为是 uni.navigateBack()，传自定义函数可覆盖（如在返回前做二次确认）
+			 * 默认行为是 nav.back()，传自定义函数可覆盖（如在返回前做二次确认）
 			 */
 			onBack: {
 				type: Function,
 				default: () => {
-					uni.navigateBack()
+					nav.back()
 				}
 			},
 			/** 标题文字 */

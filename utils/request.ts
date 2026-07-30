@@ -57,6 +57,7 @@ import Request, {
 } from '@/js_sdk/luch-request/luch-request/index.js'; // DCloud 插件市场导入版本，适配小程序/H5/App 多端
 import { storage } from '@/utils/storage';
 import { ROUTES, STORAGE_KEYS, API, API_CODE } from '@/config';
+import { nav } from '@/utils/nav';
 
 // ==================== loading 工具 ====================
 
@@ -210,7 +211,7 @@ http.interceptors.response.use(
 		// token 异常（命中配置中任意一个异常码），清除 token 并跳登录页
 		if ((API_CODE.tokenExpired as unknown as number[]).includes(body.code)) {
 			storage.remove(STORAGE_KEYS.token);
-			uni.reLaunch({ url: ROUTES.login });
+			nav.reboot(ROUTES.login);
 			return Promise.reject(new Error('登录已过期，请重新登录'));
 		}
 

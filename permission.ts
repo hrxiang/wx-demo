@@ -18,6 +18,7 @@
 
 import { storage } from '@/utils/storage';
 import { ROUTES, STORAGE_KEYS } from '@/config';
+import { nav } from '@/utils/nav';
 
 // ==================== 路由配置 ====================
 
@@ -136,13 +137,13 @@ export function initPermission() : void {
 				if (token) {
 					// 已登录时，若目标是登录页则跳首页（防止已登录用户回到登录页）
 					if (path === ROUTES.login) {
-						uni.reLaunch({ url: ROUTES.home });
+						nav.reboot(ROUTES.home);
 						return false;
 					}
 					return true;
 				} else {
 					// 未登录，跳转登录页
-					uni.reLaunch({ url: ROUTES.login });
+					nav.reboot(ROUTES.login);
 					return false;
 				}
 			},
