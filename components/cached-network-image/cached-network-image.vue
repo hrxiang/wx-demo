@@ -32,6 +32,18 @@
 			showMenuByLongpress: { // 开启长按图片显示识别小程序码菜单 微信小程序2.7.0
 				type: Boolean,
 				default: false,
+			},
+			placeholder: {
+				type: String,
+				default: null,
+			},
+			errorPlaceholder: {
+				type: String,
+				default: null,
+			},
+			enabledCustomCache: {
+				type: Boolean,
+				default: false,
 			}
 		},
 		emits: ['load', 'error'],
@@ -45,20 +57,26 @@
 		},
 		methods: {
 			async getImage() {
-				if (this.url) {
-					if (this.url.startsWith('http') || this.url.startsWith("https")) {
-						this.imgSrc = await imageCache.getCachedImage(this.url);
-					} else {
-						this.imgSrc = this.url;
-					}
+				if (this.enabledCustomCache && this.isValidUrl) {
+					this.imgSrc = await imageCache.getCachedImage(this.url);
+				} else {
+					this.imgSrc = this.url || this.placeholder;
 				}
-				return null;
 			},
 			load(event) {
 				this.$emit('load', event);
 			},
-			error(ev) {
-				this.$emit('event', event);
+			error(event) {
+				const placeholder = this.errorPlaceholder || this.placeholder;
+				if (placeholder && this.imgSrc !== placeholder) {
+					this.imgSrc = placeholder;
+				}
+				this.$emit('error', event);
+			}
+		},
+		computed: {
+			isValidUrl() {
+				return this.url && (this.url.startsWith('http') || this.url.startsWith("https"));
 			}
 		},
 		watch: {

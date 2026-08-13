@@ -118,6 +118,7 @@
 		{ title: '共享状态', url: '/pages/state-sharing-demo/state-sharing-demo' },
 		{ title: '导出Excel', url: '/pages/excel-export-demo/excel-export-demo' },
 		{ title: '导出Pdf', url: '/pages/pdf-export-demo/pdf-export-demo' },
+		{ title: 'echarts demo', url: '/pages/echarts-demo/echarts-demo' },
 	];
 	function toTestPage(url) {
 		//custom-nav-bar-demo

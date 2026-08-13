@@ -61,6 +61,12 @@
 			"style": {
 				"navigationBarTitleText": "图片导出"
 			}
+		},
+		{
+			"path": "pages/echarts-demo/echarts-demo",
+			"style": {
+				"navigationBarTitleText": ""
+			}
 		}
 	],
 	// "tabBar": {
