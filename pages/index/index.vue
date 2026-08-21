@@ -119,6 +119,8 @@
 		{ title: '导出Excel', url: '/pages/excel-export-demo/excel-export-demo' },
 		{ title: '导出Pdf', url: '/pages/pdf-export-demo/pdf-export-demo' },
 		{ title: 'echarts demo', url: '/pages/echarts-demo/echarts-demo' },
+		{ title: '下载管理器', url: '/pages/download-manager-demo/download-manager-demo' },
+		{ title: '可缩放旋转表格', url: '/pages/zoomable-table-demo/zoomable-table-demo' },
 	];
 	function toTestPage(url) {
 		//custom-nav-bar-demo

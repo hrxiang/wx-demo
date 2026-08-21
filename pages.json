@@ -67,6 +67,18 @@
 			"style": {
 				"navigationBarTitleText": ""
 			}
+		},
+		{
+			"path": "pages/download-manager-demo/download-manager-demo",
+			"style": {
+				"navigationBarTitleText": "下载管理器"
+			}
+		},
+		{
+			"path": "pages/zoomable-table-demo/zoomable-table-demo",
+			"style": {
+				"navigationBarTitleText": "可缩放旋转表格"
+			}
 		}
 	],
 	// "tabBar": {
