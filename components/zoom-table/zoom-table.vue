@@ -85,7 +85,14 @@
     <slot name="ztTop" />
 
     <!--
-      ====== 表格主体：唯一的 scroll-view ======
+      ====== 表格主体区（zt-body）：scroll-view + 悬浮按钮的公共包裹层 ======
+
+      包裹层存在的意义：缩放按钮悬浮于 scroll-view 范围内（而非整个组件），
+      避免溢出到 ztBottom 插槽区。absolute 锚点在这里。
+    -->
+    <view class="zt-body">
+      <!--
+      ====== 表格内容：唯一的 scroll-view ======
 
       核心思路：
       所有表头行和数据行都放在同一个 scroll-view 内，
@@ -180,7 +187,18 @@
           </view>
         </view>
       </view>
-    </scroll-view>
+      </scroll-view>
+
+      <!-- ====== 悬浮缩放按钮（右下角，锚定 zt-body = scroll-view 区域） ====== -->
+      <view v-if="showZoomBtn" class="zt-fab-group">
+        <view class="zt-fab-btn" hover-class="zt-fab-hover" hover-stay-time="100" @click="zoomIn">
+          <text class="zt-fab-icon">+</text>
+        </view>
+        <view class="zt-fab-btn" hover-class="zt-fab-hover" hover-stay-time="100" @click="zoomOut">
+          <text class="zt-fab-icon">-</text>
+        </view>
+      </view>
+    </view>
 
     <!-- ====== 底部插槽 ====== -->
     <slot name="ztBottom" />
@@ -202,6 +220,7 @@
  *   minScale  - 最小缩放比例（默认 0.5）
  *   maxScale  - 最大缩放比例（默认 2.0）
  *   scaleStep   - 按钮缩放步进（默认 0.1）
+ *   showZoomBtn - 是否显示悬浮缩放按钮（默认 true，关闭后仍有捏合手势/ref 方法）
  *   fontSize    - 基础字号（rpx，默认 24；可被列级 fontSize 覆盖）
  *   cellPadding - 单元格水平内边距（rpx，默认 16）
  *   cellStyle   - 单元格样式钩子（对象或函数，默认 null；
@@ -261,6 +280,15 @@ export default {
     cellPadding: {
       type: Number,
       default: 16,
+    },
+
+    /**
+     * 是否显示右下角悬浮缩放按钮（+/-）
+     * 关闭后仍可通过双指捏合手势和 ref 调用 zoomIn/zoomOut 缩放
+     */
+    showZoomBtn: {
+      type: Boolean,
+      default: true,
     },
 
     /**
@@ -519,6 +547,21 @@ export default {
 }
 
 /* ============================================================
+ *  表格主体包裹层：scroll-view + 悬浮按钮的共同定位上下文
+ *
+ *  flex: 1 + height: 0 占满根容器剩余空间（原 .zt-scroll 的职责上移），
+ *  position: relative 让缩放按钮锚定 scroll-view 区域而非整个组件，
+ *  避免按钮溢出到 ztBottom 插槽区。
+ * ============================================================ */
+.zt-body {
+  position: relative;
+  flex: 1;
+  height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================
    *  scroll-view 主体
    *
    *  flex: 1 + height: 0 是经典的 "flex 子元素填满剩余空间" 技巧：
@@ -672,5 +715,51 @@ export default {
 
 .zt-even .zt-fc-cell {
   background: #eef1fa;
+}
+
+/* ============================================================
+ *  悬浮缩放按钮（右下角 FAB）
+ *
+ *  浮于表格内容之上，不占布局空间（absolute）；
+ *  z-index: 50 高于角标(30)和表头(10)，滚动冻结层也不会盖住它。
+ *  白底圆形 + 阴影，点击分别放大/缩小（zoomIn / zoomOut）。
+ * ============================================================ */
+.zt-fab-group {
+  position: absolute;
+  right: 24rpx;
+  bottom: 48rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 50;
+}
+/*
+ * 锚定说明：bottom 参照 zt-body（scroll-view 区域），
+ * 按钮永远在滚动可视范围内，不受 ztBottom 插槽内容影响。
+ */
+
+.zt-fab-btn {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20rpx;
+}
+
+/* 按压反馈：轻微缩小 + 阴影变浅（hover-class） */
+.zt-fab-hover {
+  transform: scale(0.92);
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.12);
+}
+
+.zt-fab-icon {
+  font-size: 44rpx;
+  font-weight: 600;
+  color: #333;
+  line-height: 1;
 }
 </style>
