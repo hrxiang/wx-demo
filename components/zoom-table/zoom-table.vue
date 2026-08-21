@@ -300,11 +300,15 @@ export default {
     /**
      * 所有列总宽度（rpx）
      *
-     * 计算方式：各列 width 之和 × scale
-     * 这个值赋给 zt-inner 的 width，使内容宽度随缩放动态变化
+     * 取整口径与 buildCellStyle 一致：先各列 round 再求和。
+     * 若直接 sum × scale，与各列独立取整的累计值会有几 rpx 偏差，
+     * 列多时误差累积导致最后一列右边框与容器边缘错位。
      */
     totalWidth() {
-      return this.columns.reduce((sum, col) => sum + col.width, 0) * this.scale;
+      return this.columns.reduce(
+        (sum, col) => sum + Math.round(col.width * this.scale),
+        0,
+      );
     },
 
     /**
@@ -439,9 +443,14 @@ export default {
      */
     onTouchStart(e) {
       if (e.touches.length === 2) {
-        this._tsDist = this._dist(e.touches);
-        this._tScale = this.scale;
-        this._pinch = true;
+        const d = this._dist(e.touches);
+        // 两指触点重合（d=0）会导致 move 时除零，ratio 变 Infinity，
+        // scale 直接被钳到 maxScale 跳变，必须防御
+        if (d > 0) {
+          this._tsDist = d;
+          this._tScale = this.scale;
+          this._pinch = true;
+        }
       }
     },
 
@@ -451,6 +460,11 @@ export default {
      * 缩放公式：
      *   newScale = startScale × (currentDist / startDist)
      *
+     * 性能：量化到 0.05 步长。每次 scale 变化会触发全部单元格
+     * style 重算 + setData 传输（400 格 × 60fps 是主要开销），
+     * 0.01 精度下一次捏合产生上百个中间态纯属浪费；
+     * 0.05 粒度中间态减少 80%，视觉无感知。
+     *
      * 结果限制在 [minScale, maxScale] 范围内。
      * 注意：不要在此调用 e.preventDefault()，
      * 否则会阻止 scroll-view 的原生滚动。
@@ -458,10 +472,9 @@ export default {
     onTouchMove(e) {
       if (e.touches.length === 2 && this._pinch) {
         const ratio = this._dist(e.touches) / this._tsDist;
-        this.scale = Math.max(
-          this.minScale,
-          Math.min(this.maxScale, +(this._tScale * ratio).toFixed(2)),
-        );
+        if (!isFinite(ratio) || ratio <= 0) return;
+        const snapped = Math.round(this._tScale * ratio * 20) / 20;
+        this.scale = Math.max(this.minScale, Math.min(this.maxScale, snapped));
       }
     },
 
