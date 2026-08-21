@@ -9,7 +9,7 @@
 -->
 <template>
 	<view class="demo-page">
-		<zoom-table :columns="columns" :data="dataRows" :row-style="rowStyle" :row-height="rowHeight">
+		<zoom-table :columns="columns" :data="dataRows" :cell-style="cellStyle">
 			<template #ztTop>
 				<view>左右滑动查看更多列.右下角-/+缩放</view>
 			</template>
@@ -137,21 +137,42 @@
 			};
 		},
 		methods: {
-			rowStyle(row, i) {
-				if (i === 0) {
+			/**
+			 * 单元格样式钩子：按入参维度返回，行/列/单元格/表头样式统一入口
+			 * row === undefined 时为表头调用
+			 */
+			cellStyle(row, col, rowIndex, colIndex) {
+				console.log('cellStyle', row, col, rowIndex, colIndex);
+				// 表头：黄底定制高 + 红色边框
+				if (row === undefined) {
+					return {
+						background: 'yellow',
+						height: 100,
+						borderBottom: '1rpx solid red',
+						borderRight: '1rpx solid red',
+					};
+				}
+				// 行：第 0 行高亮加高
+				if (rowIndex === 0) {
 					return {
 						background: 'red',
 						color: '#fff',
 						height: 150,
 					};
 				}
-				return null;
-			},
-			rowHeight(row, rowIndex) {
-				if (rowIndex === 0) {
-					return 120;
+				// 行：状态为离职的行灰底
+				if(row.status === '离职'){
+					return {
+						background: 'gray',
+					};
 				}
-				return 80;
+				// 列：薪资列数字标红（按 col.key 判断，不受列顺序调整影响）
+				if (col.key === 'salary') {
+					return {
+						color: '#e53935',
+					};
+				}
+				return null;
 			}
 		}
 	};
