@@ -9,7 +9,6 @@
 -->
 <template>
 	<view class="demo-page">
-		<!-- <zoom-table :columns="columns" :data="dataRows" /> -->
 		<zoom-table :columns="columns" :data="dataRows" :row-style="rowStyle" :row-height="rowHeight">
 			<template #ztTop>
 				<view>左右滑动查看更多列.右下角-/+缩放</view>
@@ -28,6 +27,7 @@
 	 * key:   对应 data 中的字段名
 	 * title: 表头显示文字
 	 * width: 列基础宽度（rpx），实际渲染时随缩放比例调整
+	 * align: 可选，列对齐方式 'left' | 'center' | 'right'（默认 center）
 	 */
 	const COLUMNS = [{
 			key: 'id',
@@ -62,7 +62,8 @@
 		{
 			key: 'salary',
 			title: '薪资(元)',
-			width: 200
+			width: 200,
+			align: 'right' // 数字列右对齐，个十百千万对齐易读
 		},
 		{
 			key: 'phone',
@@ -72,7 +73,8 @@
 		{
 			key: 'email',
 			title: '邮箱',
-			width: 360
+			width: 360,
+			align: 'left' // 长文本列左对齐
 		},
 		{
 			key: 'address',
@@ -140,6 +142,7 @@
 					return {
 						background: 'red',
 						color: '#fff',
+						height: 150,
 					};
 				}
 				return null;

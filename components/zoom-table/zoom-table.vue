@@ -74,7 +74,8 @@
       </template>
     </zoom-table>
 
-    columns: [{ key: 'name', title: '姓名', width: 200 }, ...]  // width 单位 rpx
+    columns: [{ key: 'name', title: '姓名', width: 200, align: 'left' }, ...]
+              // width 单位 rpx；align 可选 'left'|'center'|'right'（默认 center）
     data:    [{ name: '张三', age: 18, ... }, ...]
 -->
 
@@ -135,7 +136,7 @@
             :key="`head_${i}`"
             class="zt-cell zt-h-cell"
             :class="{ 'zt-corner-cell': i === 0 }"
-            :style="cellStyle(col.width, true)"
+            :style="cellStyle(col.width, true, undefined, col.align)"
           >
             <slot name="ztHeadCell" :col="col" :colIndex="i">
               {{ col.title }}
@@ -165,7 +166,7 @@
             :key="`cell_${rowIndex}_${colIndex}`"
             class="zt-cell zt-d-cell"
             :class="{ 'zt-fc-cell': colIndex === 0 }"
-            :style="[cellStyle(col.width, false, resolveRowHeight(row, rowIndex)), getRowStyle(row, rowIndex)]"
+            :style="[cellStyle(col.width, false, resolveRowHeight(row, rowIndex), col.align), getRowStyle(row, rowIndex)]"
           >
             <slot name="ztBodyCell" :row="row" :col="col" :rowIndex="rowIndex" :colIndex="colIndex">
               {{ row[col.key] }}
@@ -211,7 +212,10 @@
     name: 'zoom-table',
 
     props: {
-      /** 列定义：[{ key: 'name', title: '姓名', width: 200 }, ...] */
+      /**
+       * 列定义：[{ key: 'name', title: '姓名', width: 200, align: 'left' }, ...]
+       * align 可选 'left' | 'center' | 'right'，默认 center，表头与数据单元格共用
+       */
       columns: {
         type: Array,
         required: true,
@@ -326,23 +330,28 @@
        *
        * @param {number} baseWidth  - 列基础宽度（rpx，来自 columns[].width）
        * @param {boolean} isHeadCell - 是否为表头单元格
+       * @param {number} rowH - 数据行高（表头单元格传 undefined）
+       * @param {string} align - 列对齐方式（来自 columns[].align，可选）
        * @returns {object} 样式对象
        *
        * 所有尺寸都乘以 scale，实现等比缩放：
        *   - 宽度、高度、字号、内边距同步缩放
        *   - 使用 toFixed(0) 取整，避免小数像素
        */
-      cellStyle(baseWidth, isHeadCell, rowH) {
+      cellStyle(baseWidth, isHeadCell, rowH, align) {
         const w = (baseWidth * this.scale).toFixed(0)
         const h = ((isHeadCell ? this.headerHeight : rowH) * this.scale).toFixed(0)
         const fs = (this.fontSize * this.scale).toFixed(0)
         const pad = (this.cellPadding * this.scale).toFixed(0)
+        // 水平对齐：单元格是 flex 布局，对齐方式映射到主轴 justify-content
+        const justifyMap = { left: 'flex-start', center: 'center', right: 'flex-end' }
         return {
           width: w + 'rpx',
           // minWidth: w + 'rpx',
           height: h + 'rpx',
           fontSize: fs + 'rpx',
           padding: `0 ${pad}rpx`,
+          justifyContent: justifyMap[align] || 'center',
         }
       },
 
